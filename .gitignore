@@ -106,3 +106,6 @@ temp/
 *.njsproj
 *.sln
 *.sw?
+
+# Changelog & Publishing
+PUBLISHING.md

@@ -15,7 +15,8 @@
     "ci-test": "node scripts/ci-test.js",
     "ci-test:ps1": "powershell -ExecutionPolicy Bypass -File scripts/ci-test.ps1",
     "ci-test:bash": "bash scripts/ci-test.sh",
-    "generate-icons": "node scripts/generate-icons.js"
+    "generate-icons": "node scripts/generate-icons.js",
+    "prepare-release": "node scripts/prepare-release.js"
   },
   "dependencies": {
     "ics": "^3.7.2",
