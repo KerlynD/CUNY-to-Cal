@@ -33,8 +33,8 @@
   },
   "options_page": "src/options/options.html",
   "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
+    "16": "icons/cunytocal-16.png",
+    "48": "icons/cunytocal-48.png",
+    "128": "icons/cunytocal-128.png"
   }
 } 

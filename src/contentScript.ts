@@ -47,24 +47,43 @@ class CUNYScheduleScraper {
         top: 20px;
         right: 20px;
         z-index: 10000;
-        background: #0066cc;
+        background: linear-gradient(135deg, #8b6f8b 0%, #6b4e71 100%);
         color: white;
-        padding: 10px 15px;
-        border-radius: 5px;
+        padding: 12px 20px;
+        border-radius: 16px;
         cursor: pointer;
-        font-family: Arial, sans-serif;
-        font-size: 12px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        transition: background 0.3s ease;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
       ">
-        📅 Export Schedule
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7,10 12,15 17,10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Export Schedule
       </div>
     `;
     
     button.addEventListener('click', async () => {
+      const buttonDiv = button.querySelector('div') as HTMLElement;
       try {
-        button.textContent = '⏳ Exporting...';
-        button.style.pointerEvents = 'none';
+        buttonDiv.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+          Exporting...
+        `;
+        buttonDiv.style.pointerEvents = 'none';
+        buttonDiv.style.opacity = '0.8';
         
         console.log('Starting schedule scrape...');
         const scheduleData = this.scrapeSchedule();
@@ -86,29 +105,68 @@ class CUNYScheduleScraper {
         });
         console.log('Background script response:', response);
         
-        button.textContent = '✅ Exported!';
+        buttonDiv.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20,6 9,17 4,12"/>
+          </svg>
+          Exported!
+        `;
+        buttonDiv.style.background = 'linear-gradient(135deg, #6a936c 0%, #557b57 100%)';
+        
         setTimeout(() => {
-          button.innerHTML = '📅 Export Schedule';
-          button.style.pointerEvents = 'auto';
+          buttonDiv.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7,10 12,15 17,10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export Schedule
+          `;
+          buttonDiv.style.background = 'linear-gradient(135deg, #8b6f8b 0%, #6b4e71 100%)';
+          buttonDiv.style.pointerEvents = 'auto';
+          buttonDiv.style.opacity = '1';
         }, 2000);
       } catch (error) {
         console.error('Export failed:', error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
         console.error('Error details:', errorMessage);
-        button.textContent = '❌ Failed';
+        
+        buttonDiv.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="15" y1="9" x2="9" y2="15"/>
+            <line x1="9" y1="9" x2="15" y2="15"/>
+          </svg>
+          Failed
+        `;
+        buttonDiv.style.background = 'linear-gradient(135deg, #b8524b 0%, #a43e55 100%)';
+        
         setTimeout(() => {
-          button.innerHTML = '📅 Export Schedule';
-          button.style.pointerEvents = 'auto';
+          buttonDiv.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7,10 12,15 17,10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export Schedule
+          `;
+          buttonDiv.style.background = 'linear-gradient(135deg, #8b6f8b 0%, #6b4e71 100%)';
+          buttonDiv.style.pointerEvents = 'auto';
+          buttonDiv.style.opacity = '1';
         }, 2000);
       }
     });
 
-    button.addEventListener('mouseenter', (e) => {
-      (e.target as HTMLElement).style.background = '#0052a3';
+    button.addEventListener('mouseenter', () => {
+      const buttonDiv = button.querySelector('div') as HTMLElement;
+      buttonDiv.style.transform = 'translateY(-2px)';
+      buttonDiv.style.boxShadow = '0 12px 30px rgba(0,0,0,0.25)';
     });
 
-    button.addEventListener('mouseleave', (e) => {
-      (e.target as HTMLElement).style.background = '#0066cc';
+    button.addEventListener('mouseleave', () => {
+      const buttonDiv = button.querySelector('div') as HTMLElement;
+      buttonDiv.style.transform = 'translateY(0)';
+      buttonDiv.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
     });
 
     document.body.appendChild(button);

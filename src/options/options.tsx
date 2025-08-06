@@ -1,6 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 
+const CalendarIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+    <line x1="16" y1="2" x2="16" y2="6"/>
+    <line x1="8" y1="2" x2="8" y2="6"/>
+    <line x1="3" y1="10" x2="21" y2="10"/>
+  </svg>
+);
+
+const BellIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+  </svg>
+);
+
+const InfoIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="10"/>
+    <path d="m12 16 0-4"/>
+    <path d="m12 8 .01 0"/>
+  </svg>
+);
+
+const CheckIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <polyline points="20,6 9,17 4,12"/>
+  </svg>
+);
+
+const SaveIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+    <polyline points="17,21 17,13 7,13 7,21"/>
+    <polyline points="7,3 7,8 15,8"/>
+  </svg>
+);
+
 interface OptionsState {
   reminderMinutes: number;
   isSaving: boolean;
@@ -62,69 +100,125 @@ const Options: React.FC = () => {
   };
 
   return (
-    <div className="container">
+    <div style={{ 
+      padding: '40px 20px',
+      minHeight: '100vh',
+      maxWidth: '800px',
+      margin: '0 auto'
+    }}>
       {/* Header */}
-      <div style={{
-        background: 'linear-gradient(135deg, #0066cc 0%, #004499 100%)',
-        color: 'white',
-        padding: '24px',
-        textAlign: 'center'
+      <div style={{ 
+        textAlign: 'center',
+        marginBottom: '40px'
       }}>
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          marginBottom: '8px'
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          background: 'rgba(255, 255, 255, 0.15)',
+          borderRadius: '20px',
+          padding: '12px 20px',
+          marginBottom: '16px',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)'
         }}>
-          <span style={{ fontSize: '32px', marginRight: '12px' }}>📅</span>
-          <h1 style={{ margin: 0, fontSize: '24px' }}>CUNY to Calendar</h1>
+          <CalendarIcon />
+          <span style={{ 
+            marginLeft: '12px',
+            fontSize: '24px', 
+            fontWeight: '700',
+            color: 'white',
+            letterSpacing: '-0.5px'
+          }}>
+            CUNY to Calendar
+          </span>
         </div>
-        <p style={{ margin: 0, opacity: 0.9, fontSize: '14px' }}>
+        <p style={{
+          fontSize: '16px',
+          color: 'rgba(255, 255, 255, 0.8)',
+          margin: 0,
+          fontWeight: '400'
+        }}>
           Configure your schedule export preferences
         </p>
       </div>
 
-      {/* Settings Content */}
-      <div style={{ padding: '32px' }}>
+      {/* Settings Grid */}
+      <div style={{
+        display: 'grid',
+        gap: '24px',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))'
+      }}>
         
-        {/* Default Reminder Setting */}
-        <div style={{ marginBottom: '32px' }}>
-          <h2 style={{ 
-            fontSize: '18px', 
-            fontWeight: '600', 
-            marginBottom: '12px',
-            color: '#333'
-          }}>
-            Default Reminder
-          </h2>
-          <p style={{ 
-            fontSize: '14px', 
-            color: '#666', 
-            marginBottom: '16px',
-            lineHeight: '1.5'
-          }}>
-            Choose how early you want to be reminded about upcoming classes.
-            This setting will be used as the default for all exports.
-          </p>
+        {/* Reminder Settings Card */}
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.15)',
+          borderRadius: '20px',
+          padding: '28px',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.2)',
+              borderRadius: '10px',
+              padding: '8px',
+              marginRight: '12px'
+            }}>
+              <BellIcon />
+            </div>
+            <div>
+              <h2 style={{ 
+                fontSize: '20px', 
+                fontWeight: '700', 
+                margin: 0,
+                color: 'white',
+                letterSpacing: '-0.3px'
+              }}>
+                Default Reminder
+              </h2>
+              <p style={{
+                fontSize: '14px',
+                color: 'rgba(255, 255, 255, 0.7)',
+                margin: '4px 0 0 0'
+              }}>
+                Set your preferred reminder time
+              </p>
+            </div>
+          </div>
           
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {[
-              { value: 0, label: 'No reminder' },
-              { value: 10, label: '10 minutes before class' },
-              { value: 30, label: '30 minutes before class' }
+              { value: 0, label: 'No reminder', desc: 'Just the event' },
+              { value: 10, label: '10 minutes before', desc: 'Quick heads up' },
+              { value: 30, label: '30 minutes before', desc: 'Time to prepare' }
             ].map(option => (
               <label
                 key={option.value}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  padding: '12px',
+                  padding: '16px',
+                  background: state.reminderMinutes === option.value 
+                    ? 'rgba(255, 255, 255, 0.25)' 
+                    : 'rgba(255, 255, 255, 0.1)',
                   border: '2px solid',
-                  borderColor: state.reminderMinutes === option.value ? '#0066cc' : '#e5e5e5',
-                  borderRadius: '6px',
+                  borderColor: state.reminderMinutes === option.value 
+                    ? 'rgba(255, 255, 255, 0.4)' 
+                    : 'rgba(255, 255, 255, 0.15)',
+                  borderRadius: '12px',
                   cursor: 'pointer',
-                  transition: 'border-color 0.2s ease',
-                  backgroundColor: state.reminderMinutes === option.value ? '#f0f8ff' : 'transparent'
+                  transition: 'all 0.2s ease',
+                  backdropFilter: 'blur(10px)'
+                }}
+                onMouseEnter={(e) => {
+                  if (state.reminderMinutes !== option.value) {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (state.reminderMinutes !== option.value) {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                  }
                 }}
               >
                 <input
@@ -133,135 +227,230 @@ const Options: React.FC = () => {
                   value={option.value}
                   checked={state.reminderMinutes === option.value}
                   onChange={() => handleReminderChange(option.value)}
-                  style={{ marginRight: '12px' }}
+                  style={{ 
+                    marginRight: '16px',
+                    accentColor: 'white',
+                    transform: 'scale(1.2)'
+                  }}
                 />
-                <span style={{ fontSize: '14px', fontWeight: '500' }}>
-                  {option.label}
-                </span>
+                <div>
+                  <div style={{ 
+                    fontSize: '15px', 
+                    fontWeight: '600',
+                    color: 'white',
+                    marginBottom: '2px'
+                  }}>
+                    {option.label}
+                  </div>
+                  <div style={{
+                    fontSize: '12px',
+                    color: 'rgba(255, 255, 255, 0.7)'
+                  }}>
+                    {option.desc}
+                  </div>
+                </div>
               </label>
             ))}
           </div>
         </div>
 
-        {/* How It Works Section */}
-        <div style={{ marginBottom: '32px' }}>
-          <h2 style={{ 
-            fontSize: '18px', 
-            fontWeight: '600', 
-            marginBottom: '12px',
-            color: '#333'
-          }}>
-            How It Works
-          </h2>
-          <div style={{ 
-            backgroundColor: '#f8f9fa', 
-            border: '1px solid #e9ecef',
-            borderRadius: '6px',
-            padding: '16px'
-          }}>
-            <ol style={{ margin: 0, paddingLeft: '20px', lineHeight: '1.6' }}>
-              <li style={{ marginBottom: '8px' }}>
-                Navigate to your CUNY schedule page (Student Center or Schedule Builder)
-              </li>
-              <li style={{ marginBottom: '8px' }}>
-                Click the extension icon or use the &quot;Export Schedule&quot; button
-              </li>
-              <li style={{ marginBottom: '8px' }}>
-                Your schedule will be converted to a standard .ics calendar file
-              </li>
-              <li>
-                Import the downloaded file into Google Calendar, Outlook, or Apple Calendar
-              </li>
-            </ol>
+        {/* How It Works Card */}
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.15)',
+          borderRadius: '20px',
+          padding: '28px',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.2)',
+              borderRadius: '10px',
+              padding: '8px',
+              marginRight: '12px'
+            }}>
+              <InfoIcon />
+            </div>
+            <h2 style={{ 
+              fontSize: '20px', 
+              fontWeight: '700', 
+              margin: 0,
+              color: 'white',
+              letterSpacing: '-0.3px'
+            }}>
+              How It Works
+            </h2>
           </div>
-        </div>
+          
+          <div style={{ marginBottom: '20px' }}>
+            {[
+              'Navigate to your CUNY schedule page',
+              'Click the extension or Export button',
+              'Download your .ics calendar file',
+              'Import into any calendar app'
+            ].map((step, index) => (
+              <div key={index} style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '12px',
+                padding: '8px 0'
+              }}>
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  borderRadius: '50%',
+                  width: '24px',
+                  height: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginRight: '12px',
+                  fontSize: '12px',
+                  fontWeight: '700',
+                  color: 'white'
+                }}>
+                  {index + 1}
+                </div>
+                <span style={{
+                  fontSize: '14px',
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  lineHeight: '1.4'
+                }}>
+                  {step}
+                </span>
+              </div>
+            ))}
+          </div>
 
-        {/* Privacy Notice */}
-        <div style={{ marginBottom: '32px' }}>
-          <h2 style={{ 
-            fontSize: '18px', 
-            fontWeight: '600', 
-            marginBottom: '12px',
-            color: '#333'
+          {/* Privacy Notice */}
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(106, 147, 108, 0.3) 0%, rgba(85, 123, 87, 0.3) 100%)',
+            borderRadius: '12px',
+            padding: '16px',
+            border: '1px solid rgba(255, 255, 255, 0.2)'
           }}>
-            Privacy & Security
-          </h2>
-          <div style={{ 
-            backgroundColor: '#e8f5e8', 
-            border: '1px solid #c3e6c3',
-            borderRadius: '6px',
-            padding: '16px'
-          }}>
-            <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5' }}>
-              🔒 Your schedule data never leaves your browser. This extension works entirely offline
-              and does not collect, store, or transmit any personal information to external servers.
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              marginBottom: '8px'
+            }}>
+              <div style={{ marginRight: '8px' }}>🔒</div>
+              <span style={{
+                fontSize: '14px',
+                fontWeight: '600',
+                color: 'white'
+              }}>
+                Privacy First
+              </span>
+            </div>
+            <p style={{ 
+              margin: 0, 
+              fontSize: '13px', 
+              lineHeight: '1.4',
+              color: 'rgba(255, 255, 255, 0.9)'
+            }}>
+              Your schedule data never leaves your browser. No tracking, no data collection.
             </p>
           </div>
         </div>
-
-        {/* Save Button */}
-        <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-          <button
-            onClick={saveSettings}
-            disabled={state.isSaving}
-            style={{
-              backgroundColor: '#0066cc',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              padding: '12px 24px',
-              fontSize: '14px',
-              fontWeight: '500',
-              cursor: state.isSaving ? 'not-allowed' : 'pointer',
-              transition: 'background-color 0.2s ease',
-              opacity: state.isSaving ? 0.7 : 1
-            }}
-            onMouseEnter={(e) => {
-              if (!state.isSaving) {
-                e.currentTarget.style.backgroundColor = '#0052a3';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!state.isSaving) {
-                e.currentTarget.style.backgroundColor = '#0066cc';
-              }
-            }}
-          >
-            {state.isSaving ? 'Saving...' : 'Save Settings'}
-          </button>
-        </div>
-
-        {/* Save Message */}
-        {state.saveMessage && (
-          <div style={{
-            textAlign: 'center',
-            padding: '10px',
-            borderRadius: '4px',
-            fontSize: '14px',
-            backgroundColor: state.saveMessage.includes('successfully') ? '#d4edda' : '#f8d7da',
-            border: `1px solid ${state.saveMessage.includes('successfully') ? '#c3e6cb' : '#f5c6cb'}`,
-            color: state.saveMessage.includes('successfully') ? '#155724' : '#721c24'
-          }}>
-            {state.saveMessage}
-          </div>
-        )}
       </div>
+
+      {/* Save Button */}
+      <div style={{ textAlign: 'center', marginTop: '32px' }}>
+        <button
+          onClick={saveSettings}
+          disabled={state.isSaving}
+          style={{
+            background: 'linear-gradient(135deg, #8b6f8b 0%, #6b4e71 100%)',
+            color: 'white',
+            border: '2px solid rgba(255, 255, 255, 0.3)',
+            borderRadius: '16px',
+            padding: '16px 32px',
+            fontSize: '16px',
+            fontWeight: '600',
+            cursor: state.isSaving ? 'not-allowed' : 'pointer',
+            transition: 'all 0.3s ease',
+            backdropFilter: 'blur(10px)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            opacity: state.isSaving ? 0.7 : 1
+          }}
+          onMouseEnter={(e) => {
+            if (!state.isSaving) {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.3)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!state.isSaving) {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = 'none';
+            }
+          }}
+        >
+          <div style={{ marginRight: '8px' }}>
+            <SaveIcon />
+          </div>
+          {state.isSaving ? 'Saving Settings...' : 'Save Settings'}
+        </button>
+      </div>
+
+      {/* Save Message */}
+      {state.saveMessage && (
+        <div style={{
+          textAlign: 'center',
+          marginTop: '16px'
+        }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            background: state.saveMessage.includes('successfully') 
+              ? 'linear-gradient(135deg, rgba(106, 147, 108, 0.9) 0%, rgba(85, 123, 87, 0.9) 100%)'
+              : 'linear-gradient(135deg, rgba(184, 82, 75, 0.9) 0%, rgba(164, 62, 85, 0.9) 100%)',
+            borderRadius: '12px',
+            padding: '12px 20px',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)'
+          }}>
+            <CheckIcon />
+            <span style={{ 
+              marginLeft: '8px',
+              fontSize: '14px',
+              color: 'white',
+              fontWeight: '500'
+            }}>
+              {state.saveMessage}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <div style={{
-        borderTop: '1px solid #e5e5e5',
-        padding: '16px 32px',
         textAlign: 'center',
-        fontSize: '12px',
-        color: '#666'
+        marginTop: '48px',
+        paddingTop: '24px',
+        borderTop: '1px solid rgba(255, 255, 255, 0.15)'
       }}>
-        <p style={{ margin: 0 }}>
+        <p style={{ 
+          margin: 0,
+          fontSize: '12px',
+          color: 'rgba(255, 255, 255, 0.6)'
+        }}>
           CUNY to Calendar Extension v1.0.0 |{' '}
           <a 
-            href="https://github.com/your-repo/cuny-to-cal" 
+            href="https://github.com/KerlynD/CUNY-to-Cal" 
             target="_blank" 
             rel="noopener noreferrer"
-            style={{ color: '#0066cc' }}
+            style={{ 
+              color: 'rgba(255, 255, 255, 0.8)',
+              textDecoration: 'none'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'white';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)';
+            }}
           >
             GitHub
           </a>

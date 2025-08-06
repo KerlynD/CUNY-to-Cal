@@ -14,7 +14,8 @@
     "check-all": "npm run type-check && npm run lint && npm run test && npm run test:e2e",
     "ci-test": "node scripts/ci-test.js",
     "ci-test:ps1": "powershell -ExecutionPolicy Bypass -File scripts/ci-test.ps1",
-    "ci-test:bash": "bash scripts/ci-test.sh"
+    "ci-test:bash": "bash scripts/ci-test.sh",
+    "generate-icons": "node scripts/generate-icons.js"
   },
   "dependencies": {
     "ics": "^3.7.2",
