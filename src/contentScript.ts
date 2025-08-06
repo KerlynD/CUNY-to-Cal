@@ -8,7 +8,6 @@ class CUNYScheduleScraper {
   }
 
   private init(): void {
-    // Looking for CUNY schedule pages
     if (this.isCUNYSchedulePage()) {
       console.log('CUNY Schedule detected, initializing scraper...');
       this.setupMessageListener();
@@ -35,7 +34,7 @@ class CUNYScheduleScraper {
           sendResponse({ success: false, error: error instanceof Error ? error.message : 'Unknown error' });
         }
       }
-      return true; // Keep message channel open for async response
+      return true; 
     });
   }
 
@@ -62,8 +61,46 @@ class CUNYScheduleScraper {
       </div>
     `;
     
-    button.addEventListener('click', () => {
-      chrome.runtime.sendMessage({ type: 'EXPORT_REQUEST' });
+    button.addEventListener('click', async () => {
+      try {
+        button.textContent = '⏳ Exporting...';
+        button.style.pointerEvents = 'none';
+        
+        console.log('Starting schedule scrape...');
+        const scheduleData = this.scrapeSchedule();
+        console.log('Schedule data scraped:', scheduleData);
+        
+        if (!scheduleData.meetings || scheduleData.meetings.length === 0) {
+          throw new Error('No schedule data found on this page. Make sure you are on a CUNY schedule page with visible courses.');
+        }
+        
+        console.log('Getting export settings...');
+        const settings = await this.getExportSettings();
+        console.log('Settings:', settings);
+        
+        console.log('Sending message to background script...');
+        const response = await chrome.runtime.sendMessage({ 
+          type: 'EXPORT_FROM_POPUP', 
+          data: scheduleData,
+          settings: settings 
+        });
+        console.log('Background script response:', response);
+        
+        button.textContent = '✅ Exported!';
+        setTimeout(() => {
+          button.innerHTML = '📅 Export Schedule';
+          button.style.pointerEvents = 'auto';
+        }, 2000);
+      } catch (error) {
+        console.error('Export failed:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        console.error('Error details:', errorMessage);
+        button.textContent = '❌ Failed';
+        setTimeout(() => {
+          button.innerHTML = '📅 Export Schedule';
+          button.style.pointerEvents = 'auto';
+        }, 2000);
+      }
     });
 
     button.addEventListener('mouseenter', (e) => {
@@ -96,42 +133,180 @@ class CUNYScheduleScraper {
 
   private scrapeScheduleBuilder(): CourseMeeting[] {
     const meetings: CourseMeeting[] = [];
+    console.log('Scraping Schedule Builder page...');
     
-    // Look for schedule builder class entries
-    const classRows = document.querySelectorAll('tr[class*="class"], .class-row, tr:has(.course-title)');
-    
-    classRows.forEach(row => {
+    try {
+      const legendMeetings = this.parseFromLegendBox();
+      if (legendMeetings.length > 0) {
+        console.log('Found courses in legend box:', legendMeetings.length);
+        meetings.push(...legendMeetings);
+      }
+    } catch (error) {
+      console.warn('Error parsing courses from legend box:', error);
+    }
+
+    if (meetings.length === 0) {
       try {
-        const meeting = this.parseScheduleBuilderRow(row as HTMLElement);
+        const urlMeetings = this.parseCoursesFromURL();
+        if (urlMeetings.length > 0) {
+          console.log('Found courses in URL:', urlMeetings.length);
+          meetings.push(...urlMeetings);
+        }
+      } catch (error) {
+        console.warn('Error parsing courses from URL:', error);
+      }
+    }
+
+    if (meetings.length === 0) {
+      console.log('Looking for course blocks in DOM...');
+      const courseBlocks = document.querySelectorAll('[class*="course"], [class*="class"], div:has(> div:contains("CSCI")), div:has(> div:contains("MATH")), div:has(> div:contains("ENGL"))');
+      console.log('Found course blocks:', courseBlocks.length);
+      
+      courseBlocks.forEach(block => {
+        try {
+          const meeting = this.parseScheduleBuilderBlock(block as HTMLElement);
+          if (meeting) {
+            meetings.push(meeting);
+          }
+        } catch (error) {
+          console.warn('Error parsing schedule builder block:', error);
+        }
+      });
+    }
+
+    if (meetings.length === 0) {
+      console.log('Looking for course text in DOM...');
+      const courseTexts = document.querySelectorAll('div, span, p, td, th');
+      let foundTexts = 0;
+      courseTexts.forEach(element => {
+        const text = element.textContent || '';
+        if (/^[A-Z]{2,4}\s+\d{3}/.test(text.trim())) { 
+          foundTexts++;
+          try {
+            const meeting = this.parseScheduleBuilderText(element as HTMLElement);
+            if (meeting) {
+              meetings.push(meeting);
+            }
+          } catch (error) {
+            console.warn('Error parsing schedule builder text:', error);
+          }
+        }
+      });
+      console.log('Found course text elements:', foundTexts);
+    }
+
+    console.log('Total meetings found:', meetings.length);
+    return meetings;
+  }
+
+  private parseFromLegendBox(): CourseMeeting[] {
+    const meetings: CourseMeeting[] = [];
+    
+    const legendBox = document.querySelector('#legend_box, .legend_box');
+    if (!legendBox) return meetings;
+    
+    const courseBoxes = legendBox.querySelectorAll('.course_box');
+    console.log('Found course boxes in legend:', courseBoxes.length);
+    
+    courseBoxes.forEach(courseBox => {
+      try {
+        const meeting = this.parseCourseBox(courseBox as HTMLElement);
         if (meeting) {
           meetings.push(meeting);
         }
       } catch (error) {
-        console.warn('Error parsing schedule builder row:', error);
+        console.warn('Error parsing course box:', error);
       }
     });
+    
+    return meetings;
+  }
 
-    // Fallback: look for any table with course information
-    if (meetings.length === 0) {
-      const tables = document.querySelectorAll('table');
-      tables.forEach(table => {
-        const rows = table.querySelectorAll('tr');
-        rows.forEach(row => {
-          const meeting = this.parseGenericScheduleRow(row as HTMLElement);
-          if (meeting) {
-            meetings.push(meeting);
-          }
-        });
-      });
+  private parseCourseBox(courseBox: HTMLElement): CourseMeeting | null {
+    const titleElement = courseBox.querySelector('.course_title');
+    if (!titleElement) return null;
+    
+    const courseCode = titleElement.textContent?.trim();
+    if (!courseCode) return null;
+    
+    const titleSpan = courseBox.querySelector('.header_cell span:not(.term_label):not(.session_label):not(.mobileNUmber)');
+    const fullTitle = titleSpan ? `${courseCode} - ${titleSpan.textContent?.trim()}` : courseCode;
+    
+    const hoursElement = courseBox.querySelector('#hoursInLegend');
+    if (!hoursElement) return null;
+    
+    const scheduleText = hoursElement.textContent || '';
+    const scheduleMatch = scheduleText.match(/(.*?)\s*:\s*(\d{1,2}:\d{2}\s*(?:AM|PM))\s*to\s*(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
+    if (!scheduleMatch) return null;
+    
+    const daysStr = scheduleMatch[1].trim();
+    const startTime = this.parseTime(scheduleMatch[2].replace(/\s/g, ''));
+    const endTime = this.parseTime(scheduleMatch[3].replace(/\s/g, ''));
+    const days = this.parseDays(daysStr);
+    
+    if (days.length === 0) return null;
+    
+    const instructorElement = courseBox.querySelector('.rightnclear[title="Instructor(s)"]');
+    const instructor = instructorElement ? instructorElement.textContent?.trim() || 'TBA' : 'TBA';
+    
+    const locationElement = courseBox.querySelector('.location_block');
+    const location = locationElement ? locationElement.textContent?.trim() || 'TBA' : 'TBA';
+    
+    const termLabel = courseBox.querySelector('.term_label');
+    const termText = termLabel ? termLabel.textContent || '' : '';
+    
+    return {
+      courseId: courseCode.replace(/\s+/g, '-'),
+      title: fullTitle,
+      instructor,
+      location,
+      startDate: this.getCurrentSemesterStart(),
+      endDate: this.getCurrentSemesterEnd(),
+      days,
+      startTime,
+      endTime
+    };
+  }
+
+  private parseCoursesFromURL(): CourseMeeting[] {
+    const meetings: CourseMeeting[] = [];
+    const url = new URL(window.location.href);
+    const params = url.searchParams;
+    
+    let courseIndex = 0;
+    while (true) {
+      const courseParam = params.get(`course_${courseIndex}_0`);
+      if (!courseParam) break;
+      
+      const courseMatch = courseParam.match(/([A-Z]{2,4})-(\d{3})/);
+      if (courseMatch) {
+        const courseId = courseParam;
+        const title = `${courseMatch[1]} ${courseMatch[2]}`;
+        
+        const meeting: CourseMeeting = {
+          courseId,
+          title,
+          instructor: 'TBA',
+          location: 'TBA',
+          startDate: this.getCurrentSemesterStart(),
+          endDate: this.getCurrentSemesterEnd(),
+          days: ['MO', 'WE'], 
+          startTime: '09:00',
+          endTime: '10:15'
+        };
+        
+        meetings.push(meeting);
+      }
+      
+      courseIndex++;
     }
-
+    
     return meetings;
   }
 
   private scrapeStudentCenter(): CourseMeeting[] {
     const meetings: CourseMeeting[] = [];
     
-    // Look for class schedule table rows
     const scheduleRows = document.querySelectorAll('tr[id*="CLASS_"], .ps_box-group tr, table.PSLEVEL1GRID tr');
     
     scheduleRows.forEach(row => {
@@ -148,8 +323,77 @@ class CUNYScheduleScraper {
     return meetings;
   }
 
+  private parseScheduleBuilderBlock(block: HTMLElement): CourseMeeting | null {
+    const text = block.textContent || '';
+    
+    const courseMatch = text.match(/([A-Z]{2,4})\s+(\d{3})/);
+    if (!courseMatch) return null;
+    
+    const courseId = `${courseMatch[1]}-${courseMatch[2]}`;
+    
+    const titleMatch = text.match(/[A-Z]{2,4}\s+\d{3}\s+([^•\n]+)/);
+    const title = titleMatch ? titleMatch[1].trim() : courseId;
+    
+    const timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:AM|PM))\s*to\s*(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
+    if (!timeMatch) return null;
+    
+    const startTime = this.parseTime(timeMatch[1].replace(/\s/g, ''));
+    const endTime = this.parseTime(timeMatch[2].replace(/\s/g, ''));
+    
+    const daysMatch = text.match(/(Mon|Tue|Wed|Thu|Fri|Sat|Sun)(?:,\s*(Mon|Tue|Wed|Thu|Fri|Sat|Sun))?/i);
+    const days = this.parseDays(daysMatch ? daysMatch[0] : '');
+    
+    if (days.length === 0) return null;
+    
+    return {
+      courseId,
+      title,
+      instructor: 'TBA',
+      location: 'TBA',
+      startDate: this.getCurrentSemesterStart(),
+      endDate: this.getCurrentSemesterEnd(),
+      days,
+      startTime,
+      endTime
+    };
+  }
+
+  private parseScheduleBuilderText(element: HTMLElement): CourseMeeting | null {
+    const text = element.textContent || '';
+    
+    const courseMatch = text.match(/([A-Z]{2,4})\s+(\d{3})/);
+    if (!courseMatch) return null;
+    
+    const courseId = `${courseMatch[1]}-${courseMatch[2]}`;
+    
+    const titleMatch = text.match(/[A-Z]{2,4}\s+\d{3}\s+([^•\n]+)/);
+    const title = titleMatch ? titleMatch[1].trim() : courseId;
+    
+    const timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:AM|PM))\s*to\s*(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
+    if (!timeMatch) return null;
+    
+    const startTime = this.parseTime(timeMatch[1].replace(/\s/g, ''));
+    const endTime = this.parseTime(timeMatch[2].replace(/\s/g, ''));
+    
+    const daysMatch = text.match(/(Mon|Tue|Wed|Thu|Fri|Sat|Sun)(?:,\s*(Mon|Tue|Wed|Thu|Fri|Sat|Sun))?/i);
+    const days = this.parseDays(daysMatch ? daysMatch[0] : '');
+    
+    if (days.length === 0) return null;
+    
+    return {
+      courseId,
+      title,
+      instructor: 'TBA',
+      location: 'TBA',
+      startDate: this.getCurrentSemesterStart(),
+      endDate: this.getCurrentSemesterEnd(),
+      days,
+      startTime,
+      endTime
+    };
+  }
+
   private parseScheduleBuilderRow(row: HTMLElement): CourseMeeting | null {
-    // Extract course information from schedule builder format
     const cells = row.querySelectorAll('td, th');
     if (cells.length < 4) return null;
 
@@ -249,33 +493,18 @@ class CUNYScheduleScraper {
     return match ? match[0] : '';
   }
 
-  private parseDays(daysText: string): string[] {
-    const days: string[] = [];
-    const normalizedText = daysText.replace(/\s+/g, '');
 
-    const patterns = [
-      { regex: /([MTWFS])/g, map: (m: string) => DAY_MAP[m] },
-      { regex: /(Mo|Tu|We|Th|Fr|Sa|Su)/g, map: (m: string) => DAY_MAP[m] }
-    ];
-
-    for (const pattern of patterns) {
-      const matches = normalizedText.match(pattern.regex);
-      if (matches) {
-        matches.forEach(match => {
-          const mapped = pattern.map(match);
-          if (mapped && !days.includes(mapped)) {
-            days.push(mapped);
-          }
-        });
-        break;
-      }
-    }
-
-    return days;
-  }
 
   private parseTime(timeStr: string, period?: string): string {
-    const [hoursStr, minutesStr] = timeStr.split(':');
+    const cleanTime = timeStr.replace(/\s/g, '');
+    let [hoursStr, minutesStr] = cleanTime.split(':');
+    
+    const ampmMatch = minutesStr?.match(/(\d+)(AM|PM)/i);
+    if (ampmMatch) {
+      minutesStr = ampmMatch[1];
+      period = ampmMatch[2];
+    }
+    
     let hours = Number(hoursStr);
     const minutes = Number(minutesStr);
     
@@ -290,9 +519,63 @@ class CUNYScheduleScraper {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
 
-  private detectSemester(): string {
-    const pageText = document.body.textContent || '';
+  private parseDays(daysStr: string): string[] {
+    const dayMap: Record<string, string> = {
+      'Mon': 'MO',
+      'Tue': 'TU', 
+      'Wed': 'WE',
+      'Thu': 'TH',
+      'Fri': 'FR',
+      'Sat': 'SA',
+      'Sun': 'SU',
+      'Monday': 'MO',
+      'Tuesday': 'TU',
+      'Wednesday': 'WE', 
+      'Thursday': 'TH',
+      'Friday': 'FR',
+      'Saturday': 'SA',
+      'Sunday': 'SU'
+    };
+
+    const days: string[] = [];
+    const dayNames = daysStr.split(/[,\s]+/).filter(d => d.length > 0);
     
+    for (const dayName of dayNames) {
+      const icsDay = dayMap[dayName];
+      if (icsDay && !days.includes(icsDay)) {
+        days.push(icsDay);
+      }
+    }
+    
+    return days;
+  }
+
+  private detectSemester(): string {
+    const termLabels = document.querySelectorAll('.term_label');
+    for (const label of termLabels) {
+      const text = label.textContent || '';
+      const seasonMatch = text.match(/(\d{4})\s+(Fall|Spring|Summer|Winter)/i);
+      if (seasonMatch) {
+        return `${seasonMatch[2]} ${seasonMatch[1]}`;
+      }
+    }
+    
+    const url = new URL(window.location.href);
+    const termParam = url.searchParams.get('term');
+    if (termParam) {
+      const termMatch = termParam.match(/(\d{2})(\d{2})(\d{2})/);
+      if (termMatch) {
+        const year = `20${termMatch[2]}`;
+        const semesterCode = termMatch[3];
+        let semester = 'Fall';
+        if (semesterCode === '10') semester = 'Spring';
+        else if (semesterCode === '20') semester = 'Summer';
+        else if (semesterCode === '30') semester = 'Fall';
+        return `${semester} ${year}`;
+      }
+    }
+    
+    const pageText = document.body.textContent || '';
     const seasonMatch = pageText.match(/(Fall|Spring|Summer|Winter)\s*(\d{4})/i);
     if (seasonMatch) {
       return `${seasonMatch[1]} ${seasonMatch[2]}`;
@@ -317,19 +600,15 @@ class CUNYScheduleScraper {
     const month = now.getMonth() + 1;
     
     if (month >= 8 || month <= 1) {
-      // Fall semester
       return `${year}-08-28`;
     } else if (month >= 2 && month <= 5) {
-      // Spring semester
       return `${year}-01-28`;
     } else {
-      // Summer semester
       return `${year}-06-01`;
     }
   }
 
   private getCurrentSemesterEnd(): string {
-    // Default semester end dates
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth() + 1;
@@ -343,6 +622,18 @@ class CUNYScheduleScraper {
     } else {
       // Summer semester
       return `${year}-08-15`;
+    }
+  }
+
+  private async getExportSettings(): Promise<{ reminderMinutes: number }> {
+    try {
+      const result = await chrome.storage.sync.get(['reminderMinutes']);
+      return {
+        reminderMinutes: result.reminderMinutes ?? 10
+      };
+    } catch (error) {
+      console.error('Failed to load settings:', error);
+      return { reminderMinutes: 10 };
     }
   }
 }

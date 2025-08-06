@@ -9,14 +9,12 @@ import {
   MOCK_SEMESTER_CONTEXT_HTML 
 } from './fixtures/mockScheduleHTML';
 
-// Mock the content script module since it auto-initializes
 jest.mock('../contentScript', () => ({}));
 
 describe('Schedule Scraping', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
     
-    // Mock window.location
     Object.defineProperty(window, 'location', {
       value: {
         href: 'https://home.cunyfirst.cuny.edu/test/CLASS_SCHEDULE'
@@ -76,7 +74,6 @@ describe('Schedule Scraping', () => {
       const scheduleRows = document.querySelectorAll('tr[id*="CLASS_"], .ps_box-group tr, table.PSLEVEL1GRID tr');
       expect(scheduleRows.length).toBeGreaterThan(0);
       
-      // Check first row has expected content
       const firstRow = scheduleRows[0] as HTMLElement;
       expect(firstRow.textContent).toContain('CSCI-316');
     });
@@ -87,7 +84,6 @@ describe('Schedule Scraping', () => {
       const classRows = document.querySelectorAll('tr[class*="class"], .class-row');
       expect(classRows.length).toBeGreaterThan(0);
       
-      // Check first row has expected content
       const firstRow = classRows[0] as HTMLElement;
       expect(firstRow.textContent).toContain('CSCI-340');
     });
@@ -159,7 +155,6 @@ describe('Schedule Scraping', () => {
         expectedSemester = `Summer ${year}`;
       }
       
-      // This simulates the fallback logic
       expect(expectedSemester).toMatch(/(Fall|Spring|Summer) \d{4}/);
     });
   });

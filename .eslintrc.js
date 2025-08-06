@@ -21,7 +21,7 @@ module.exports = {
   rules: {
     '@typescript-eslint/no-explicit-any': 'warn',
     '@typescript-eslint/no-unused-vars': 'error',
-    '@typescript-eslint/no-var-requires': 'off', // Allow require() in tests
+    '@typescript-eslint/no-var-requires': 'off', 
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'off',
     'prefer-const': 'error'

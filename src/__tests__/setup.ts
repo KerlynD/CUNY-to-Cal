@@ -1,6 +1,5 @@
 // Jest setup file for Chrome extension testing
 
-// Mock Chrome APIs
 (global as any).chrome = {
   runtime: {
     onMessage: {
@@ -25,11 +24,9 @@
   }
 } as any;
 
-// Mock URL.createObjectURL and revokeObjectURL
 (global as any).URL.createObjectURL = jest.fn(() => 'mock-object-url');
 (global as any).URL.revokeObjectURL = jest.fn();
 
-// Mock Blob
 (global as any).Blob = jest.fn().mockImplementation((content, options) => ({
   content,
   options,

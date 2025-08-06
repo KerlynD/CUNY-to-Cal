@@ -16,7 +16,13 @@ class CUNYCalendarExporter {
 
     chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender, sendResponse) => {
       if (message.type === 'EXPORT_FROM_POPUP') {
-        this.handleExportFromPopup(message.settings).then(sendResponse);
+        if (message.data && message.settings) {
+          this.generateAndDownloadICS(message.data, message.settings)
+            .then(() => sendResponse({ success: true }))
+            .catch((error) => sendResponse({ success: false, error: error.message }));
+        } else {
+          this.handleExportFromPopup(message.settings).then(sendResponse);
+        }
         return true;
       }
     });
@@ -36,7 +42,6 @@ class CUNYCalendarExporter {
 
       const settings = await this.getExportSettings();
       
-      // Generate and download ICS file
       await this.generateAndDownloadICS(response.data, settings);
       
     } catch (error) {
@@ -164,7 +169,6 @@ class CUNYCalendarExporter {
   }
 
   private formatDateForUntil(date: Date): string {
-    // Convert to UTC and format as YYYYMMDDTHHMMSSZ
     const utc = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
     const year = utc.getUTCFullYear();
     const month = (utc.getUTCMonth() + 1).toString().padStart(2, '0');
@@ -178,19 +182,14 @@ class CUNYCalendarExporter {
 
   private async downloadFile(content: string, filename: string): Promise<void> {
     try {
-      const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-
+      const dataUrl = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(content);
+      
       const downloadId = await chrome.downloads.download({
-        url: url,
+        url: dataUrl,
         filename: filename,
         saveAs: false
       });
-
-      setTimeout(() => {
-        URL.revokeObjectURL(url);
-      }, 1000);
-
+      
       console.log(`Downloaded ${filename} with ID: ${downloadId}`);
       
       chrome.runtime.sendMessage({
@@ -208,7 +207,7 @@ class CUNYCalendarExporter {
     try {
       const result = await chrome.storage.sync.get(['reminderMinutes']);
       return {
-        reminderMinutes: result.reminderMinutes ?? 10 // Default to 10 minutes
+        reminderMinutes: result.reminderMinutes ?? 10 
       };
     } catch (error) {
       console.error('Failed to load settings:', error);

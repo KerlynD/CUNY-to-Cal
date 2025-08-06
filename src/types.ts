@@ -11,7 +11,7 @@ export interface CourseMeeting {
 }
 
 export interface ScheduleData {
-  semester: string;   // "Fall 2025"
+  semester: string;   
   meetings: CourseMeeting[];
 }
 
@@ -27,7 +27,6 @@ export interface ExportSettings {
   reminderMinutes: number; // 0, 10, or 30
 }
 
-// Day mapping for ICS format
 export const DAY_MAP: Record<string, string> = {
   'M': 'MO',
   'T': 'TU', 

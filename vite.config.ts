@@ -6,24 +6,19 @@ import fs from 'fs';
 export default defineConfig({
   plugins: [
     react(),
-    // Simple plugin to copy static files
     {
       name: 'copy-files',
       writeBundle() {
-        // Ensure dist directory exists
         if (!fs.existsSync('dist')) {
           fs.mkdirSync('dist', { recursive: true });
         }
         
-        // Copy manifest.json
         fs.copyFileSync('manifest.json', 'dist/manifest.json');
         
-        // Create icons directory and copy placeholder files
         if (!fs.existsSync('dist/icons')) {
           fs.mkdirSync('dist/icons', { recursive: true });
         }
         
-        // Copy icon placeholders
         if (fs.existsSync('src/icons')) {
           const files = fs.readdirSync('src/icons');
           files.forEach(file => {

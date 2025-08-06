@@ -19,9 +19,7 @@ const Popup: React.FC = () => {
   });
 
   useEffect(() => {
-    // Load saved settings
     loadSettings();
-    // Check if current tab is a CUNY page
     checkCurrentPage();
   }, []);
 
@@ -63,10 +61,8 @@ const Popup: React.FC = () => {
     }));
 
     try {
-      // Save current reminder setting
       await chrome.storage.sync.set({ reminderMinutes: state.reminderMinutes });
 
-      // Send export request to background script
       await chrome.runtime.sendMessage({
         type: 'EXPORT_FROM_POPUP',
         settings: { reminderMinutes: state.reminderMinutes }
@@ -246,7 +242,6 @@ const Popup: React.FC = () => {
   );
 };
 
-// Mount the popup
 const container = document.getElementById('popup-root');
 if (container) {
   const root = createRoot(container);

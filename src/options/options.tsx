@@ -44,7 +44,6 @@ const Options: React.FC = () => {
         saveMessage: 'Settings saved successfully!'
       }));
 
-      // Clear success message after 3 seconds
       setTimeout(() => {
         setState(prev => ({ ...prev, saveMessage: null }));
       }, 3000);
@@ -272,7 +271,6 @@ const Options: React.FC = () => {
   );
 };
 
-// Mount the options page
 const container = document.getElementById('options-root');
 if (container) {
   const root = createRoot(container);

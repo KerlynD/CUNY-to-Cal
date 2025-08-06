@@ -7,7 +7,7 @@ module.exports = {
     '^.+\\.tsx?$': 'ts-jest'
   },
   // setupFilesAfterEnv: ['<rootDir>/src/__tests__/e2e-setup.ts'],
-  testTimeout: 30000, // 30 seconds for browser tests
+  testTimeout: 30000, 
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
     '!src/**/*.d.ts',

@@ -24,13 +24,10 @@ describe('Chrome Extension Integration Tests', () => {
   };
 
   test('should export complete schedule workflow', async () => {
-    // Mock the entire export workflow
     const exportWorkflow = async (scheduleData: ScheduleData, settings: { reminderMinutes: number }) => {
-      // 1. Validate schedule data
       expect(scheduleData.meetings).toHaveLength(1);
       expect(scheduleData.semester).toBe('Fall 2025');
       
-      // 2. Create events from meetings
       const events = scheduleData.meetings.map(meeting => ({
         uid: `${meeting.courseId}-${meeting.startTime}-${meeting.days.join('')}`,
         title: `${meeting.title} (${meeting.courseId})`,
@@ -40,10 +37,8 @@ describe('Chrome Extension Integration Tests', () => {
         hasReminder: settings.reminderMinutes > 0
       }));
       
-      // 3. Generate filename
       const filename = `Schedule-${scheduleData.semester.replace(/\s+/g, '-')}.ics`;
       
-      // 4. Return export result
       return {
         success: true,
         events,
@@ -90,14 +85,11 @@ describe('Chrome Extension Integration Tests', () => {
       ]
     };
 
-    // Validate that we can handle lecture + lab format
     expect(complexScheduleData.meetings).toHaveLength(2);
     
-    // Both meetings should have the same course ID but different patterns
     const courseIds = complexScheduleData.meetings.map(m => m.courseId);
     expect(courseIds.every(id => id === 'CSCI-340')).toBe(true);
     
-    // Different meeting times/days
     const days = complexScheduleData.meetings.map(m => m.days.join(','));
     expect(days).toEqual(['MO,WE', 'FR']);
   });
@@ -115,7 +107,6 @@ describe('Chrome Extension Integration Tests', () => {
       endTime: '15:15'
     };
 
-    // Validate that essential fields are present
     const isValidMeeting = (meeting: Partial<CourseMeeting>): boolean => {
       return !!(
         meeting.courseId && 
@@ -156,7 +147,6 @@ describe('Chrome Extension Integration Tests', () => {
     const uids = meetings.map(generateUID);
     const uniqueUIDs = new Set(uids);
 
-    // All UIDs should be unique
     expect(uniqueUIDs.size).toBe(meetings.length);
     expect(uids).toEqual([
       'MATH-101-09:00-MOWE',

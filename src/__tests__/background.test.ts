@@ -4,12 +4,10 @@
 
 import { CourseMeeting, ScheduleData } from '../types';
 
-// Mock the ics library
 jest.mock('ics', () => ({
   createEvents: jest.fn()
 }));
 
-// Mock the background script module since it auto-initializes
 jest.mock('../background', () => ({}));
 
 describe('Background Service Worker', () => {
@@ -57,7 +55,7 @@ describe('Background Service Worker', () => {
 
       const date = parseDate('2025-08-28');
       expect(date.getFullYear()).toBe(2025);
-      expect(date.getMonth()).toBe(7); // August is month 7 (0-indexed)
+      expect(date.getMonth()).toBe(7); 
       expect(date.getDate()).toBe(28);
     });
   });
@@ -89,9 +87,8 @@ describe('Background Service Worker', () => {
     test('should create valid event attributes from course meeting', () => {
       const meeting = mockScheduleData.meetings[0];
       
-             // Mock the event creation logic
        const createEventFromMeeting = (meeting: CourseMeeting, reminderMinutes: number) => {
-         const startDate = new Date(2025, 7, 28); // August 28, 2025 (month is 0-indexed)
+         const startDate = new Date(2025, 7, 28); 
         const [startHour, startMinute] = meeting.startTime.split(':').map(Number);
         const [endHour, endMinute] = meeting.endTime.split(':').map(Number);
 
@@ -162,7 +159,7 @@ describe('Background Service Worker', () => {
 
       expect(generateFilename('Fall 2025')).toBe('Schedule-Fall-2025.ics');
       expect(generateFilename('Spring 2024')).toBe('Schedule-Spring-2024.ics');
-      expect(generateFilename('Summer  2025')).toBe('Schedule-Summer-2025.ics'); // Extra space
+      expect(generateFilename('Summer  2025')).toBe('Schedule-Summer-2025.ics'); 
     });
   });
 
