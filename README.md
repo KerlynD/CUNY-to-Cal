@@ -2,7 +2,7 @@
 
 A Chrome extension that lets CUNY students export their class schedules from CUNYFIRST to standard calendar formats (.ics) in one click.
 
-[![Build Status](https://github.com/your-repo/cuny-to-cal/workflows/Build%20and%20Test/badge.svg)](https://github.com/your-repo/cuny-to-cal/actions)
+[![Build Status](https://github.com/KerlynD/CUNY-to-cal/workflows/Build%20and%20Test/badge.svg)](https://github.com/KerlynD/CUNY-to-Cal/actions)
 
 ## Features
 
