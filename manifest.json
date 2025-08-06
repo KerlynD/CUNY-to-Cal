@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "CUNY to Calendar",
+  "version": "1.0.0",
+  "description": "Export your CUNY schedule to calendar apps in one click",
+  "permissions": [
+    "activeTab",
+    "downloads",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://home.cunyfirst.cuny.edu/*",
+    "https://schedulebuilder.cuny.edu/*",
+    "https://sb.cunyfirst.cuny.edu/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://home.cunyfirst.cuny.edu/*/CLASS_SCHEDULE*",
+        "https://schedulebuilder.cuny.edu/*",
+        "https://sb.cunyfirst.cuny.edu/*"
+      ],
+      "js": ["contentScript.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "Export CUNY Schedule"
+  },
+  "options_page": "src/options/options.html",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+} 
