@@ -3,9 +3,8 @@
 A Chrome extension that lets CUNY students export their class schedules from CUNYFIRST to standard calendar formats (.ics) in one click.
 
 [![Build Status](https://github.com/your-repo/cuny-to-cal/workflows/Build%20and%20Test/badge.svg)](https://github.com/your-repo/cuny-to-cal/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## ✨ Features
+## Features
 
 - **One-Click Export**: Export your entire semester schedule with a single click
 - **Universal Compatibility**: Works with Google Calendar, Outlook, Apple Calendar, and any app that supports .ics files
@@ -15,12 +14,11 @@ A Chrome extension that lets CUNY students export their class schedules from CUN
 - **Privacy First**: All processing happens locally in your browser - no data is sent to external servers
 - **Offline Operation**: Works completely offline after installation
 
-## 🎯 Supported Pages
+## Supported Pages
 
-- **Student Center**: `https://home.cunyfirst.cuny.edu/*/CLASS_SCHEDULE*`
 - **Schedule Builder**: `https://schedulebuilder.cuny.edu/*` and `https://sb.cunyfirst.cuny.edu/*`
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
@@ -37,14 +35,12 @@ A Chrome extension that lets CUNY students export their class schedules from CUN
 ### Usage
 
 1. **Navigate to Your Schedule**
-   - Go to your CUNY Student Center Class Schedule page, or
-   - Use the CUNY Schedule Builder
+   - Go to your CUNY Schedule Builder
 
 2. **Export Your Schedule**
    - Click the extension icon in your browser toolbar, or
    - Click the floating "📅 Export Schedule" button that appears on the page
-   - Choose your reminder preference (optional)
-   - Click "📥 Export Schedule"
+   - You can choose your reminder preference from the extension icon in your browser toolbar (optional)
 
 3. **Import to Your Calendar**
    - The `Schedule-[Semester]-[Year].ics` file will download automatically
@@ -53,7 +49,7 @@ A Chrome extension that lets CUNY students export their class schedules from CUN
      - **Outlook**: File → Open & Export → Import/Export → Import an iCalendar (.ics) file
      - **Apple Calendar**: File → Import → Select the .ics file
 
-## 🛠️ Development
+## Development
 
 ### Prerequisites
 
@@ -127,7 +123,7 @@ npm run type-check
 npm run lint && npm run type-check && npm test
 ```
 
-## 🏗️ Build Process
+## Build Process
 
 The extension uses Vite for building and bundles everything for Manifest V3 compliance:
 
@@ -148,19 +144,10 @@ npm run zip
 # The cuny-to-cal.zip file is ready for Chrome Web Store submission
 ```
 
-## 🔒 Privacy & Security
-
-- **No Data Collection**: The extension does not collect, store, or transmit any personal information
-- **Local Processing**: All schedule parsing and ICS generation happens in your browser
-- **No Network Requests**: The extension works completely offline after installation
-- **Minimal Permissions**: Only requests essential permissions (`activeTab`, `downloads`, `storage`)
-
-## 🐛 Troubleshooting
-
 ### Common Issues
 
 **Extension doesn't activate on CUNY pages**
-- Ensure you're on a supported page (Student Center Class Schedule or Schedule Builder)
+- Ensure you're on a supported page ( Schedule Builder)
 - Try refreshing the page
 - Check that the extension is enabled in `chrome://extensions/`
 
@@ -189,7 +176,7 @@ npm run zip
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read our contributing guidelines:
+Contributions are welcome!
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -206,29 +193,16 @@ Contributions are welcome! Please read our contributing guidelines:
 - Update documentation as needed
 - Ensure builds are successful before submitting PRs
 
-## 📋 Roadmap
-
-- [ ] Support for additional CUNY campus variations
-- [ ] Custom semester date ranges
-- [ ] Color coding for different course types
-- [ ] Export to other formats (Google Calendar URL, etc.)
-- [ ] Firefox support (WebExtensions compatibility)
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Built for CUNY students by CUNY students
 - Uses the excellent [ics](https://www.npmjs.com/package/ics) library for calendar generation
 - Inspired by the need for better schedule management tools in academic environments
 
-## 📞 Support
+## Support
 
 - **Issues**: [GitHub Issues](https://github.com/your-repo/cuny-to-cal/issues)
-- **Email**: your-email@example.com
-- **CUNY Students**: Check your campus technology help desk for additional support
+- **Email**: difokerlyn19@example.com
 
 ---
 

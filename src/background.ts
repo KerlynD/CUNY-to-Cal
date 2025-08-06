@@ -191,11 +191,6 @@ class CUNYCalendarExporter {
       });
       
       console.log(`Downloaded ${filename} with ID: ${downloadId}`);
-      
-      chrome.runtime.sendMessage({
-        type: 'EXPORT_COMPLETE',
-        data: { filename }
-      });
 
     } catch (error) {
       console.error('Download failed:', error);

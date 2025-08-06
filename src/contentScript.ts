@@ -1,4 +1,4 @@
-import { CourseMeeting, ScheduleData, ExtensionMessage, DAY_MAP } from './types';
+import { CourseMeeting, ScheduleData, ExtensionMessage } from './types';
 
 class CUNYScheduleScraper {
   private currentUrl = window.location.href;
@@ -252,8 +252,7 @@ class CUNYScheduleScraper {
     const locationElement = courseBox.querySelector('.location_block');
     const location = locationElement ? locationElement.textContent?.trim() || 'TBA' : 'TBA';
     
-    const termLabel = courseBox.querySelector('.term_label');
-    const termText = termLabel ? termLabel.textContent || '' : '';
+
     
     return {
       courseId: courseCode.replace(/\s+/g, '-'),
@@ -274,9 +273,8 @@ class CUNYScheduleScraper {
     const params = url.searchParams;
     
     let courseIndex = 0;
-    while (true) {
-      const courseParam = params.get(`course_${courseIndex}_0`);
-      if (!courseParam) break;
+    let courseParam = params.get(`course_${courseIndex}_0`);
+    while (courseParam) {
       
       const courseMatch = courseParam.match(/([A-Z]{2,4})-(\d{3})/);
       if (courseMatch) {
@@ -299,6 +297,7 @@ class CUNYScheduleScraper {
       }
       
       courseIndex++;
+      courseParam = params.get(`course_${courseIndex}_0`);
     }
     
     return meetings;
@@ -497,8 +496,9 @@ class CUNYScheduleScraper {
 
   private parseTime(timeStr: string, period?: string): string {
     const cleanTime = timeStr.replace(/\s/g, '');
-    let [hoursStr, minutesStr] = cleanTime.split(':');
+    const [hoursStr, initialMinutesStr] = cleanTime.split(':');
     
+    let minutesStr = initialMinutesStr;
     const ampmMatch = minutesStr?.match(/(\d+)(AM|PM)/i);
     if (ampmMatch) {
       minutesStr = ampmMatch[1];

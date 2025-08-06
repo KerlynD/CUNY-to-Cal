@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { DAY_MAP } from '../types';
+
 import { 
   MOCK_STUDENT_CENTER_HTML, 
   MOCK_SCHEDULE_BUILDER_HTML,
@@ -23,23 +23,7 @@ describe('Schedule Scraping', () => {
     });
   });
 
-  describe('Day Mapping', () => {
-    test('should correctly map single letter days', () => {
-      expect(DAY_MAP['M']).toBe('MO');
-      expect(DAY_MAP['T']).toBe('TU');
-      expect(DAY_MAP['W']).toBe('WE');
-      expect(DAY_MAP['TH']).toBe('TH');
-      expect(DAY_MAP['F']).toBe('FR');
-    });
 
-    test('should correctly map two letter days', () => {
-      expect(DAY_MAP['Mo']).toBe('MO');
-      expect(DAY_MAP['Tu']).toBe('TU');
-      expect(DAY_MAP['We']).toBe('WE');
-      expect(DAY_MAP['Th']).toBe('TH');
-      expect(DAY_MAP['Fr']).toBe('FR');
-    });
-  });
 
   describe('CUNY Page Detection', () => {
     test('should detect Student Center schedule page', () => {

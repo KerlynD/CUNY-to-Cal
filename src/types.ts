@@ -27,20 +27,4 @@ export interface ExportSettings {
   reminderMinutes: number; // 0, 10, or 30
 }
 
-export const DAY_MAP: Record<string, string> = {
-  'M': 'MO',
-  'T': 'TU', 
-  'W': 'WE',
-  'TH': 'TH',
-  'F': 'FR',
-  'S': 'SA',
-  'SU': 'SU',
-  // Alternative formats
-  'Mo': 'MO',
-  'Tu': 'TU',
-  'We': 'WE',
-  'Th': 'TH',
-  'Fr': 'FR',
-  'Sa': 'SA',
-  'Su': 'SU'
-}; 
+ 
